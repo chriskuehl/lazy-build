@@ -9,6 +9,9 @@ import itertools
 import json
 import os
 import os.path
+import shutil
+import tarfile
+import tempfile
 
 
 def hash(data):
@@ -16,6 +19,7 @@ def hash(data):
 
 
 class BuildContext(collections.namedtuple('BuildContext', (
+    'command',
     'files',
 ))):
 
@@ -23,7 +27,10 @@ class BuildContext(collections.namedtuple('BuildContext', (
 
     @property
     def hash(self):
-        return hash(json.dumps(self.files, sort_keys=True).encode('utf8'))
+        return hash(json.dumps(
+            (self.command, self.files),
+            sort_keys=True,
+        ).encode('utf8'))
 
 
 class FileContext(collections.namedtuple('FileContext', (
@@ -38,9 +45,10 @@ class FileContext(collections.namedtuple('FileContext', (
         assert os.path.lexists(path), path
 
         if os.path.islink(path):
-            # TODO: does this properly handle non-utf8 paths?
-            # (how does Python turn those into strings?)
-            return cls('link', hash(os.readlink(path).encode('utf8')))
+            return cls(
+                'link',
+                hash(os.readlink(path).encode('utf8', 'surrogateescape')),
+            )
         else:
             with open(path, 'rb') as f:
                 return cls('file', hash(f.read()))
@@ -65,7 +73,7 @@ def should_ignore(patterns, path):
     )
 
 
-def build_context(conf):
+def build_context(conf, command):
     ctx = {}
     fringe = {
         os.path.relpath(os.path.realpath(path)) for path in conf.context
@@ -87,4 +95,33 @@ def build_context(conf):
         else:
             ctx[path] = FileContext.from_path(path)
 
-    return BuildContext(files=ctx)
+    return BuildContext(command=command, files=ctx)
+
+
+def package_artifact(conf):
+    fd, path = tempfile.mkstemp()
+    try:
+        with tarfile.TarFile(fileobj=os.fdopen(fd, mode='wb'), mode='w') as tf:
+            for output_path in conf.output:
+                if os.path.isdir(output_path):
+                    for path, _, filenames in os.walk(output_path):
+                        for filename in filenames:
+                            print(filename)
+                            tf.add(os.path.join(output_path, filename))
+                else:
+                    tf.add(output_path)
+    finally:
+        os.close(fd)
+    return path
+
+
+def extract_artifact(conf, artifact):
+    for output_path in conf.output:
+        if os.path.lexists(output_path):
+            if os.path.isdir(output_path) and not os.path.islink(output_path):
+                shutil.rmtree(output_path)
+            else:
+                os.remove(output_path)
+
+    with tarfile.TarFile(artifact) as tf:
+        tf.extractall()

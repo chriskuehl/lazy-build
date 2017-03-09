@@ -3,17 +3,45 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import argparse
+import json
+import os
+import subprocess
 
 from lazy_build import config
 from lazy_build import context
 
 
 def build(conf, args):
-    ctx = context.build_context(conf)
+    ctx = context.build_context(conf, args.command)
 
-    import json
-    print(json.dumps(ctx.files, indent=True, sort_keys=True))
-    print('hash:', ctx.hash)
+    if args.verbose:
+        print('Generated build context with hash {}'.format(ctx.hash))
+        print('Individual files:')
+        print(json.dumps(ctx.files, indent=True, sort_keys=True))
+
+    if conf.backend.has_artifact(ctx):
+        print('[lazy-build] found pre-existing build artifact')
+        return build_from_artifact(conf, ctx)
+    else:
+        print('[lazy-build] found no build artifact')
+        return build_from_command(conf, ctx)
+
+
+def build_from_artifact(conf, ctx):
+    artifact = conf.backend.get_artifact(ctx)
+    try:
+        context.extract_artifact(conf, artifact)
+    finally:
+        os.remove(artifact)
+
+
+def build_from_command(conf, ctx):
+    subprocess.check_call(ctx.command)
+    path = context.package_artifact(conf)
+    try:
+        conf.backend.store_artifact(ctx, path)
+    finally:
+        os.remove(path)
 
 
 def invalidate(conf, args):
@@ -52,6 +80,9 @@ def main(argv=None):
     parser.add_argument(
         '--dry-run', default=False, action='store_true',
         help='say what would be done, without doing it',
+    )
+    parser.add_argument(
+        '--verbose', '-v', default=False, action='store_true',
     )
     parser.add_argument(
         '--action', choices=ACTIONS.keys(), required=True,
