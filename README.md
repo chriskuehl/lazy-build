@@ -45,7 +45,11 @@ made.
 Located as `.lazy-build.yaml` at the root of your project.
 
 ```yaml
-fail_on_missing: True
+cache:
+    source: s3
+    bucket: my-cool-bucket
+    path: cache/my-cool-service
+
 ignore: [
     '*.py[co]',
     '*~',
