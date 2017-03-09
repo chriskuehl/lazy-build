@@ -17,4 +17,7 @@ setup(
     ],
     install_requires=[],
     packages=find_packages(exclude=('tests*', 'testing*')),
+    entry_points={
+        'console_scripts': ['lazy-build = lazy_build.cli:main'],
+    },
 )
