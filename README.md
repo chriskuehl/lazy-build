@@ -1,5 +1,9 @@
 # lazy-build
 
+[![Build Status](https://travis-ci.org/chriskuehl/lazy-build.svg?branch=master)](https://travis-ci.org/chriskuehl/lazy-build)
+[![Coverage Status](https://coveralls.io/repos/github/chriskuehl/lazy-build/badge.svg?branch=master)](https://coveralls.io/github/chriskuehl/lazy-build?branch=master)
+[![PyPI version](https://badge.fury.io/py/lazy-build.svg)](https://pypi.python.org/pypi/lazy-build)
+
 Cache build artifacts based on files on disk.
 
 
