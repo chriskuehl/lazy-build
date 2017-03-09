@@ -35,7 +35,8 @@ def test_build_context_simple(tmpdir):
     conf = config.Config(
         context={tmpdir.strpath, tmpdir.join('a').strpath},
         ignore={'d'},
-        cache=None,
+        output=('output',),
+        backend=None,
     )
     tmpdir.join('a').write(b'foo')
     tmpdir.join('b').mkdir()
@@ -43,8 +44,11 @@ def test_build_context_simple(tmpdir):
     tmpdir.join('d').mkdir()
     tmpdir.join('d/e').write(b'baz')
     tmpdir.join('f').mksymlinkto('/etc/passwd')
-    assert context.build_context(conf) == context.BuildContext(files={
-        'a': context.FileContext('file', context.hash(b'foo')),
-        'b/c': context.FileContext('file', context.hash(b'bar')),
-        'f': context.FileContext('link', context.hash(b'/etc/passwd')),
-    })
+    assert context.build_context(conf, 'command') == context.BuildContext(
+        files={
+            'a': context.FileContext('file', context.hash(b'foo')),
+            'b/c': context.FileContext('file', context.hash(b'bar')),
+            'f': context.FileContext('link', context.hash(b'/etc/passwd')),
+        },
+        command='command',
+    )

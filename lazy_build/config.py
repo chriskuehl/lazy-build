@@ -4,11 +4,14 @@ from __future__ import unicode_literals
 
 import collections
 
+from lazy_build import cache
+
 
 class Config(collections.namedtuple('Config', (
     'context',
     'ignore',
-    'cache',
+    'output',
+    'backend',
 ))):
 
     __slots__ = ()
@@ -18,19 +21,14 @@ class Config(collections.namedtuple('Config', (
         # TODO: this method should also consider config files
 
         # TODO: this
-        cache = CacheConfigS3(
-            bucket='my-cool-bucket',
-            path='/',
+        backend = cache.S3Backend(
+            bucket='some-bucket',
+            path='ckuehl/lazy-build/',
         )
 
         return cls(
-            context=frozenset(args.context or ()),
+            context=frozenset(args.context),
             ignore=frozenset(args.ignore or ()),
-            cache=cache,
+            output=frozenset(args.output),
+            backend=backend,
         )
-
-
-CacheConfigS3 = collections.namedtuple('CacheConfigS3', (
-    'bucket',
-    'path',
-))
