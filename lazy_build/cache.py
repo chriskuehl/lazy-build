@@ -50,3 +50,6 @@ class S3Backend(collections.namedtuple('S3Backend', (
             path,
             self.key_for_ctx(ctx),
         )
+
+    def invalidate_artifact(self, ctx):
+        raise NotImplementedError()

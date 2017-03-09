@@ -99,20 +99,17 @@ def build_context(conf, command):
 
 
 def package_artifact(conf):
-    fd, path = tempfile.mkstemp()
-    try:
-        with tarfile.TarFile(fileobj=os.fdopen(fd, mode='wb'), mode='w') as tf:
-            for output_path in conf.output:
-                if os.path.isdir(output_path):
-                    for path, _, filenames in os.walk(output_path):
-                        for filename in filenames:
-                            print(filename)
-                            tf.add(os.path.join(output_path, filename))
-                else:
-                    tf.add(output_path)
-    finally:
-        os.close(fd)
-    return path
+    fd, tmp = tempfile.mkstemp()
+    os.close(fd)
+    with tarfile.TarFile(tmp, mode='w') as tf:
+        for output_path in conf.output:
+            if os.path.isdir(output_path):
+                for path, _, filenames in os.walk(output_path):
+                    for filename in filenames:
+                        tf.add(os.path.join(path, filename))
+            else:
+                tf.add(output_path)
+    return tmp
 
 
 def extract_artifact(conf, artifact):
