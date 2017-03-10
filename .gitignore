@@ -5,6 +5,7 @@
 /.tox
 /.venv.touch
 /.venv.tox.touch
+/build
 /coverage-html
 /dist
 /venv

@@ -7,6 +7,11 @@ minimal: venv
 venv: .venv.touch
 	tox -e venv $(REBUILD_FLAG)
 
+.PHONY: release
+release: venv
+	venv/bin/python setup.py sdist bdist_wheel
+	venv/bin/twine upload --skip-existing dist/*
+
 .PHONY: test
 test: .venv.tox.touch
 	tox $(REBUILD_FLAG)
