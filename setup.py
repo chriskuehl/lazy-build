@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='lazy-build',
-    version='0.0.0.dev1',
+    version='0.0.1',
     classifiers=[
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
