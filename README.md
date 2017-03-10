@@ -46,19 +46,21 @@ made.
 
 ### The config file
 
-Located as `.lazy-build.yaml` at the root of your project.
+Located as `.lazy-build.json` at the root of your project.
 
-```yaml
-cache:
-    source: s3
-    bucket: my-cool-bucket
-    path: cache/my-cool-service
-
-ignore: [
-    '*.py[co]',
-    '*~',
-    '.*.sw*',
-    '.DS_Store',
-    '.nfs*',
-]
+```json
+{
+    "cache": {
+        "source": "s3",
+        "bucket": "my-cool-bucket",
+        "path": "cache/my-cool-service"
+    },
+    "ignore": [
+        "*.py[co]",
+        "*~",
+        ".*.sw*",
+        ".DS_Store",
+        ".nfs*"
+    ]
+}
 ```
