@@ -96,7 +96,7 @@ def build_context(conf, command):
 def package_artifact(conf):
     fd, tmp = tempfile.mkstemp()
     os.close(fd)
-    with tarfile.TarFile(tmp, mode='w') as tf:
+    with tarfile.open(tmp, mode='w:gz') as tf:
         for output_path in conf.output:
             if os.path.isdir(output_path):
                 for path, _, filenames in os.walk(output_path):
@@ -115,5 +115,5 @@ def extract_artifact(conf, artifact):
             else:
                 os.remove(output_path)
 
-    with tarfile.TarFile(artifact) as tf:
+    with tarfile.open(artifact, 'r:gz') as tf:
         tf.extractall()

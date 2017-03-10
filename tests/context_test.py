@@ -77,7 +77,7 @@ def test_package_artifact(tmpdir):
         after_download=None,
     ))
     try:
-        with tarfile.TarFile(tmp) as tf:
+        with tarfile.open(tmp, 'r:gz') as tf:
             members = {member.name for member in tf.getmembers()}
     finally:
         os.remove(tmp)
@@ -94,7 +94,7 @@ def test_extract_artifact(tmpdir):
     tmpdir.join('a/b/sup').ensure()
 
     tar = tmpdir.join('my.tar').strpath
-    with tarfile.TarFile(tar, 'w') as tf:
+    with tarfile.open(tar, 'w:gz') as tf:
         for path in ('my.txt', 'hello/there.txt', 'a/b/c/d.txt'):
             ti = tarfile.TarInfo(path)
             ti.size = 6
