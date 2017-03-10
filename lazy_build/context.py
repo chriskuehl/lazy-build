@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import collections
 import fnmatch
 import hashlib
@@ -90,8 +86,7 @@ def build_context(conf, command):
         if os.path.isdir(path) and not os.path.islink(path):
             for child in os.listdir(path):
                 child = os.path.relpath(os.path.join(path, child))
-                if child not in explored:
-                    fringe.add(child)
+                fringe.add(child)
         else:
             ctx[path] = FileContext.from_path(path)
 

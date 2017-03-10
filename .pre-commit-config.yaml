@@ -29,12 +29,13 @@
         language_version: python3.5
     -   id: fix-encoding-pragma
         language_version: python3.5
+        args: ['--remove']
 -   repo: https://github.com/asottile/reorder_python_imports
     sha: v0.3.1
     hooks:
     -   id: reorder-python-imports
         language_version: python3.5
         args: [
-            '--add-import', 'from __future__ import absolute_import',
-            '--add-import', 'from __future__ import unicode_literals',
+            '--remove-import', 'from __future__ import absolute_import',
+            '--remove-import', 'from __future__ import unicode_literals',
         ]

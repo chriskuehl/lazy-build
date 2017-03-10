@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import argparse
 import json
 import os
@@ -116,7 +112,7 @@ def main(argv=None):
     # TODO: is there a way we can get argparse to do this for us?
     if args.command[0] != '--':
         raise ValueError(
-            'You must separate the command from the other arguments with a --!',
+            'You must separate the command from the other arguments with a --!',  # noqa
         )
 
     del args.command[0]
