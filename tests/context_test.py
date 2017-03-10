@@ -17,6 +17,7 @@ from lazy_build import context
     ({'venv/with'}, 'this/is/some/venv/with/a/file'),
     ({'*.swp'}, 'something.swp'),
     ({'*.swp'}, 'hello/there/something.swp'),
+    ({'.*.sw[a-z]'}, 'my/.thing.txt.swo'),
 ))
 def test_should_ignore_true(patterns, path):
     assert context.should_ignore(patterns, path) is True
@@ -38,6 +39,7 @@ def test_build_context_simple(tmpdir):
         ignore={'d'},
         output=None,
         backend=None,
+        after_download=None,
     )
     tmpdir.join('a').write(b'foo')
     tmpdir.join('b').mkdir()
@@ -72,6 +74,7 @@ def test_package_artifact(tmpdir):
         ignore=None,
         output=('b', 'c'),
         backend=None,
+        after_download=None,
     ))
     try:
         with tarfile.TarFile(tmp) as tf:
@@ -102,6 +105,7 @@ def test_extract_artifact(tmpdir):
         ignore=None,
         output=('my.txt', 'hello', 'a/b'),
         backend=None,
+        after_download=None,
     ), tar)
 
     assert tmpdir.join('my.txt').read() == 'wuddup'
