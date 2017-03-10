@@ -42,6 +42,12 @@ def build_from_artifact(conf, ctx):
         log(color.yellow('done!'))
     finally:
         os.remove(artifact)
+    if conf.after_download:
+        log(color.yellow('Running after-download script...'))
+        log(color.yellow('$ ' + conf.after_download))
+        # TODO: let's use trailing equal syntax so we can avoid this?
+        subprocess.check_call(shlex.split(conf.after_download))
+        log(color.yellow('done!'))
 
 
 def build_from_command(conf, ctx):
@@ -85,7 +91,7 @@ def main(argv=None):
         help='file or directory to consider as output from a successful build',
     )
     parser.add_argument(
-        '--after-download',
+        '--after-download', required=False,
         help=(
             'command to run after downloading an artifact '
             '(for example, to adjust shebangs for the new path)'

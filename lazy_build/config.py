@@ -15,6 +15,7 @@ class Config(collections.namedtuple('Config', (
     'ignore',
     'output',
     'backend',
+    'after_download',
 ))):
 
     __slots__ = ()
@@ -38,4 +39,5 @@ class Config(collections.namedtuple('Config', (
             ignore=frozenset(args.ignore or ()) | conf_ignore,
             output=frozenset(args.output),
             backend=backend,
+            after_download=args.after_download,
         )
