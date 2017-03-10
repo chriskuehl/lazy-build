@@ -1,8 +1,4 @@
-# -*- coding: utf-8 -*-
 """Stolen from ocflib.misc.shell"""
-from __future__ import absolute_import
-from __future__ import unicode_literals
-
 import sys
 
 # terminal text color wrappers;
