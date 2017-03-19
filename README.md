@@ -11,14 +11,11 @@ Cache build artifacts based on files on disk.
 ### Building
 
 ```bash
-$ lazy-build \
-    --context requirements*.txt \
-    --context setup.py \
-    --context /etc/lsb_release \
-    --output venv \
-    --after-download venv/bin/python -m virtualenv_tools --update-path {pwd}/venv venv \
-    build -- \
-    bash -euxc 'virtualenv -ppython3 venv && venv/bin/pip install -r requirements.txt'
+$ lazy-build build
+    context= requirements*.txt setup.py /etc/lsb_release
+    output= venv \
+    after-download= venv/bin/python -m virtualenv_tools --update-path {pwd}/venv venv \
+    command= bash -euxc 'virtualenv -ppython3 venv && venv/bin/pip install -r requirements.txt'
 ```
 
 
@@ -28,14 +25,11 @@ $ lazy-build \
 It builds up the context, then deletes the artifact matching it.
 
 ```bash
-$ lazy-build
-    --context requirements*.txt \
-    --context setup.py \
-    --context /etc/lsb_release \
-    --output venv \
-    --after-download venv/bin/python -m virtualenv_tools --update-path {pwd}/venv venv \
-    invalidate -- \
-    bash -euxc 'virtualenv -ppython3 venv && venv/bin/pip install -r requirements.txt'
+$ lazy-build invalidate
+    context= requirements*.txt setup.py /etc/lsb_release
+    output= venv \
+    after-download= venv/bin/python -m virtualenv_tools --update-path {pwd}/venv venv \
+    command= bash -euxc 'virtualenv -ppython3 venv && venv/bin/pip install -r requirements.txt'
 ```
 
 Ideally it would have an option to mark that the artifact should *not* be
