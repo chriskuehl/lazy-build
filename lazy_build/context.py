@@ -69,7 +69,7 @@ def should_ignore(patterns, path):
     )
 
 
-def build_context(conf, command):
+def build_context(conf):
     ctx = {}
     fringe = {
         os.path.relpath(os.path.realpath(path)) for path in conf.context
@@ -90,7 +90,7 @@ def build_context(conf, command):
         else:
             ctx[path] = FileContext.from_path(path)
 
-    return BuildContext(command=command, files=ctx)
+    return BuildContext(command=conf.command, files=ctx)
 
 
 def package_artifact(conf):

@@ -5,7 +5,6 @@ import tarfile
 
 import pytest
 
-from lazy_build import config
 from lazy_build import context
 
 
@@ -32,14 +31,12 @@ def test_should_ignore_false(patterns, path):
     assert context.should_ignore(patterns, path) is False
 
 
-def test_build_context_simple(tmpdir):
+def test_build_context_simple(simple_config, tmpdir):
     tmpdir.chdir()
-    conf = config.Config(
+    conf = simple_config._replace(
         context={tmpdir.strpath, tmpdir.join('a').strpath},
         ignore={'d'},
-        output=None,
-        backend=None,
-        after_download=None,
+        command=('command',),
     )
     tmpdir.join('a').write(b'foo')
     tmpdir.join('b').mkdir()
@@ -48,33 +45,30 @@ def test_build_context_simple(tmpdir):
     tmpdir.join('d/e').write(b'baz')
     tmpdir.join('f').mksymlinkto('/etc/passwd')
 
-    ctx = context.build_context(conf, 'command')
+    ctx = context.build_context(conf)
     assert ctx == context.BuildContext(
         files={
             'a': context.FileContext('file', context.hash(b'foo')),
             'b/c': context.FileContext('file', context.hash(b'bar')),
             'f': context.FileContext('link', context.hash(b'/etc/passwd')),
         },
-        command='command',
+        command=('command',),
     )
     assert ctx.hash == context.hash(
-        json.dumps(('command', ctx.files), sort_keys=True).encode('utf8'),
+        json.dumps((('command',), ctx.files), sort_keys=True).encode('utf8'),
     )
 
 
-def test_package_artifact(tmpdir):
+def test_package_artifact(simple_config, tmpdir):
     tmpdir.chdir()
     tmpdir.join('a').ensure()
     tmpdir.join('b').mkdir()
     tmpdir.join('b/c').ensure()
     tmpdir.join('c').ensure()
 
-    tmp = context.package_artifact(config.Config(
-        context=None,
-        ignore=None,
-        output=('b', 'c'),
-        backend=None,
-        after_download=None,
+    tmp = context.package_artifact(simple_config._replace(
+        ignore={},
+        output={'b', 'c'},
     ))
     try:
         with tarfile.open(tmp, 'r:gz') as tf:
@@ -85,7 +79,7 @@ def test_package_artifact(tmpdir):
     assert members == {'b/c', 'c'}
 
 
-def test_extract_artifact(tmpdir):
+def test_extract_artifact(simple_config, tmpdir):
     tmpdir.chdir()
     tmpdir.join('my.txt').write('this is not the text you are looking for')
     tmpdir.join('a').mkdir()
@@ -100,12 +94,8 @@ def test_extract_artifact(tmpdir):
             ti.size = 6
             tf.addfile(ti, fileobj=io.BytesIO(b'wuddup'))
 
-    context.extract_artifact(config.Config(
-        context=None,
-        ignore=None,
-        output=('my.txt', 'hello', 'a/b'),
-        backend=None,
-        after_download=None,
+    context.extract_artifact(simple_config._replace(
+        output={'my.txt', 'hello', 'a/b'},
     ), tar)
 
     assert tmpdir.join('my.txt').read() == 'wuddup'

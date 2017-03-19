@@ -1,4 +1,3 @@
-import argparse
 import json
 import os
 import shlex
@@ -16,10 +15,10 @@ def log(line, **kwargs):
     print('{}'.format(line), **kwargs)
 
 
-def build(conf, args):
-    ctx = context.build_context(conf, args.command)
+def build(conf):
+    ctx = context.build_context(conf)
 
-    if args.verbose:
+    if conf.verbose:
         log('Generated build context with hash {}'.format(ctx.hash))
         log('Individual files:')
         log(json.dumps(ctx.files, indent=True, sort_keys=True))
@@ -64,7 +63,7 @@ def build_from_command(conf, ctx):
         os.remove(path)
 
 
-def invalidate(conf, args):
+def invalidate(conf):
     raise NotImplementedError()
 
 
@@ -75,55 +74,5 @@ ACTIONS = {
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(
-        description='Cache build artifacts based on files on disk.',
-    )
-    parser.add_argument(
-        '--context', nargs='+', required=True,
-        help='file or directory to include in the build context',
-    )
-    parser.add_argument(
-        '--ignore', nargs='+', required=False,
-        help='paths to exclude when creating the build context',
-    )
-    parser.add_argument(
-        '--output', nargs='+', required=True,
-        help='file or directory to consider as output from a successful build',
-    )
-    parser.add_argument(
-        '--after-download', required=False,
-        help=(
-            'command to run after downloading an artifact '
-            '(for example, to adjust shebangs for the new path)'
-        ),
-    )
-    parser.add_argument(
-        '--dry-run', default=False, action='store_true',
-        help='say what would be done, without doing it',
-    )
-    parser.add_argument(
-        '--verbose', '-v', default=False, action='store_true',
-    )
-    parser.add_argument(
-        '--action', choices=ACTIONS.keys(), required=True,
-        help='action to take',
-    )
-    parser.add_argument(
-        'command', nargs=argparse.REMAINDER,
-        help='build command to execute',
-    )
-
-    args = parser.parse_args(argv)
-
-    # TODO: is there a way we can get argparse to do this for us?
-    if args.command[0] != '--':
-        raise ValueError(
-            'You must separate the command from the other arguments with a --!',  # noqa
-        )
-
-    del args.command[0]
-    if len(args.command) == 0:
-        raise ValueError('You must specify a command!')
-
-    conf = config.Config.from_args(args)
-    return ACTIONS[args.action](conf, args)
+    conf = config.Config.from_args(argv or sys.argv[1:])
+    return ACTIONS[conf.action](conf)
