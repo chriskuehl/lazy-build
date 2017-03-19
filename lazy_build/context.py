@@ -6,7 +6,7 @@ import json
 import os
 import os.path
 import shutil
-import tarfile
+import subprocess
 import tempfile
 
 
@@ -96,14 +96,23 @@ def build_context(conf, command):
 def package_artifact(conf):
     fd, tmp = tempfile.mkstemp()
     os.close(fd)
-    with tarfile.open(tmp, mode='w:gz') as tf:
-        for output_path in conf.output:
-            if os.path.isdir(output_path):
-                for path, _, filenames in os.walk(output_path):
-                    for filename in filenames:
-                        tf.add(os.path.join(path, filename))
-            else:
-                tf.add(output_path)
+
+    paths = set()
+    for output_path in conf.output:
+        if os.path.isdir(output_path):
+            for path, _, filenames in os.walk(output_path):
+                for filename in filenames:
+                    paths.add(os.path.join(path, filename))
+        else:
+            paths.add(output_path)
+
+    subprocess.run(
+        ('tar', '-czf', tmp, '--files-from', '-'),
+        input=b'\n'.join(
+            path.encode('utf8', 'surrogateescape') for path in paths
+        ),
+        check=True,
+    )
     return tmp
 
 
@@ -115,5 +124,4 @@ def extract_artifact(conf, artifact):
             else:
                 os.remove(output_path)
 
-    with tarfile.open(artifact, 'r:gz') as tf:
-        tf.extractall()
+    subprocess.run(('tar', '-xzf', artifact), check=True)
