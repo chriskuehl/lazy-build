@@ -11,8 +11,8 @@ Cache build artifacts based on files on disk.
 ### Building
 
 ```bash
-$ lazy-build build
-    context= requirements*.txt setup.py /etc/lsb_release
+$ lazy-build build \
+    context= requirements*.txt setup.py /etc/lsb_release \
     output= venv \
     after-download= venv/bin/python -m virtualenv_tools --update-path {pwd}/venv venv \
     command= bash -euxc 'virtualenv -ppython3 venv && venv/bin/pip install -r requirements.txt'
@@ -25,8 +25,8 @@ $ lazy-build build
 It builds up the context, then deletes the artifact matching it.
 
 ```bash
-$ lazy-build invalidate
-    context= requirements*.txt setup.py /etc/lsb_release
+$ lazy-build invalidate \
+    context= requirements*.txt setup.py /etc/lsb_release \
     output= venv \
     after-download= venv/bin/python -m virtualenv_tools --update-path {pwd}/venv venv \
     command= bash -euxc 'virtualenv -ppython3 venv && venv/bin/pip install -r requirements.txt'
