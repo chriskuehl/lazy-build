@@ -6,6 +6,9 @@ import boto3
 import botocore
 
 
+ArtifactDetails = collections.namedtuple('ArtifactDetails', ('size',))
+
+
 class S3Backend(collections.namedtuple('S3Backend', (
     'bucket',
     'path',
@@ -24,34 +27,37 @@ class S3Backend(collections.namedtuple('S3Backend', (
         key = self.key_for_ctx(ctx)
         return key + '.tar.gz', key + '.json'
 
-    def has_artifact(self, ctx):
+    def artifact_details(self, ctx):
         tarball, json = self.artifact_paths(ctx)
-        # what a ridiculous dance we have to do here...
         try:
-            self.s3.Object(self.bucket, tarball).load()
+            obj = self.s3.Object(self.bucket, tarball)
+            obj.load()
+            return ArtifactDetails(obj.content_length)
         except botocore.exceptions.ClientError as ex:
             if ex.response['Error']['Code'] == '404':
-                return False
+                return None
             else:
                 raise
-        else:
-            return True
 
-    def get_artifact(self, ctx):
+    def get_artifact(self, ctx, callback):
         tarball, json = self.artifact_paths(ctx)
         fd, path = tempfile.mkstemp()
         os.close(fd)
-        self.s3.Bucket(self.bucket).download_file(
+        self.s3.meta.client.download_file(
+            self.bucket,
             tarball,
             path,
+            Callback=callback,
         )
         return path
 
-    def store_artifact(self, ctx, path):
+    def store_artifact(self, ctx, path, callback):
         tarball, json = self.artifact_paths(ctx)
-        self.s3.Bucket(self.bucket).upload_file(
+        self.s3.meta.client.upload_file(
             path,
-            tarball,
+            Key=tarball,
+            Bucket=self.bucket,
+            Callback=callback,
         )
 
     def invalidate_artifact(self, ctx):

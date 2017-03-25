@@ -7,6 +7,7 @@ import sys
 from lazy_build import color
 from lazy_build import config
 from lazy_build import context
+from lazy_build import progressbar
 
 
 def log(line, **kwargs):
@@ -23,17 +24,19 @@ def build(conf):
         log('Individual files:')
         log(json.dumps(ctx.files, indent=True, sort_keys=True))
 
-    if conf.backend.has_artifact(ctx):
+    artifact = conf.backend.artifact_details(ctx)
+    if artifact is not None:
         log(color.bg_gray('Found remote build artifact, downloading.'))
-        return build_from_artifact(conf, ctx)
+        return build_from_artifact(conf, ctx, artifact)
     else:
         log(color.bg_gray('Found no remote build artifact, building locally.'))
         return build_from_command(conf, ctx)
 
 
-def build_from_artifact(conf, ctx):
+def build_from_artifact(conf, ctx, artifact):
     log(color.yellow('Downloading artifact...'), end=' ')
-    artifact = conf.backend.get_artifact(ctx)
+    with progressbar.Progress(artifact.size) as callback:
+        artifact = conf.backend.get_artifact(ctx, callback)
     log(color.yellow('done!'))
     try:
         log(color.yellow('Extracting artifact...'), end=' ')
@@ -57,7 +60,10 @@ def build_from_command(conf, ctx):
     log(color.yellow('done!'))
     try:
         log(color.yellow('Uploading artifact to shared cache...'), end=' ')
-        conf.backend.store_artifact(ctx, path)
+
+        total_bytes = os.stat(path).st_size
+        with progressbar.Progress(total_bytes) as callback:
+            conf.backend.store_artifact(ctx, path, callback)
         log(color.yellow('done!'))
     finally:
         os.remove(path)
