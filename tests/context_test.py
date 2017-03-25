@@ -71,7 +71,7 @@ def test_package_artifact(simple_config, tmpdir):
         output={'b', 'c'},
     ))
     try:
-        with tarfile.open(tmp, 'r:gz') as tf:
+        with tarfile.open(tmp, 'r') as tf:
             members = {member.name for member in tf.getmembers()}
     finally:
         os.remove(tmp)
@@ -88,7 +88,7 @@ def test_extract_artifact(simple_config, tmpdir):
     tmpdir.join('a/b/sup').ensure()
 
     tar = tmpdir.join('my.tar').strpath
-    with tarfile.open(tar, 'w:gz') as tf:
+    with tarfile.open(tar, 'w') as tf:
         for path in ('my.txt', 'hello/there.txt', 'a/b/c/d.txt'):
             ti = tarfile.TarInfo(path)
             ti.size = 6

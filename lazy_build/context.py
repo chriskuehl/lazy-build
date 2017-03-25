@@ -107,7 +107,7 @@ def package_artifact(conf):
             paths.add(output_path)
 
     subprocess.run(
-        ('tar', '-czf', tmp, '--files-from', '-'),
+        ('tar', '-cf', tmp, '--files-from', '-'),
         input=b'\n'.join(
             path.encode('utf8', 'surrogateescape') for path in paths
         ),
@@ -124,4 +124,4 @@ def extract_artifact(conf, artifact):
             else:
                 os.remove(output_path)
 
-    subprocess.run(('tar', '-xzf', artifact), check=True)
+    subprocess.run(('tar', '-xf', artifact), check=True)
