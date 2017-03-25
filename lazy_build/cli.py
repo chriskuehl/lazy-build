@@ -34,10 +34,9 @@ def build(conf):
 
 
 def build_from_artifact(conf, ctx, artifact):
-    log(color.yellow('Downloading artifact...'), end=' ')
+    log(color.yellow('Downloading artifact...'))
     with progressbar.Progress(artifact.size) as callback:
         artifact = conf.backend.get_artifact(ctx, callback)
-    log(color.yellow('done!'))
     try:
         log(color.yellow('Extracting artifact...'), end=' ')
         context.extract_artifact(conf, artifact)
@@ -46,10 +45,11 @@ def build_from_artifact(conf, ctx, artifact):
         os.remove(artifact)
     if conf.after_download:
         log(color.yellow('Running after-download script...'))
-        log(color.yellow('$ ' + conf.after_download))
-        # TODO: let's use trailing equal syntax so we can avoid this?
-        subprocess.check_call(shlex.split(conf.after_download))
-        log(color.yellow('done!'))
+        log(color.yellow(
+            '$ ' + ' '.join(shlex.quote(arg) for arg in conf.after_download)
+        ))
+        subprocess.check_call(conf.after_download)
+        log(color.yellow('Done!'))
 
 
 def build_from_command(conf, ctx):
@@ -59,7 +59,7 @@ def build_from_command(conf, ctx):
     path = context.package_artifact(conf)
     log(color.yellow('done!'))
     try:
-        log(color.yellow('Uploading artifact to shared cache...'), end=' ')
+        log(color.yellow('Uploading artifact to shared cache...'))
 
         total_bytes = os.stat(path).st_size
         with progressbar.Progress(total_bytes) as callback:

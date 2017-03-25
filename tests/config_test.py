@@ -30,6 +30,7 @@ def with_config_file(tmpdir):
             'context=', 'requirements.txt', 'setup.py',
             'ignore=', '*.py[co]', '*.swp',
             'output=', 'venv', 'node_modules',
+            'after-download=', 'python', '-m', 'virtualenv_tools',
             'command=', 'venv-update', 'venv=', '-ppython2.7',
         ),
         config.Config(
@@ -41,7 +42,7 @@ def with_config_file(tmpdir):
             ignore={'*.py[co]', '*.swp', '.DS_Store'},
             output={'venv', 'node_modules'},
             backend=mock.ANY,
-            after_download=(),
+            after_download=('python', '-m', 'virtualenv_tools'),
         ),
     ),
     (
