@@ -12,6 +12,6 @@ setup(
     install_requires=['boto3'],
     packages=find_packages(exclude=('tests*', 'testing*')),
     entry_points={
-        'console_scripts': ['lazy-build = lazy_build.cli:main'],
+        'console_scripts': ['lazy-build = lazy_build.main:main'],
     },
 )
