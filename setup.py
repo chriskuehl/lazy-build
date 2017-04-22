@@ -7,7 +7,7 @@ setup(
     version='0.2.0',
     classifiers=[
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
     install_requires=['boto3'],
     packages=find_packages(exclude=('tests*', 'testing*')),
