@@ -1,7 +1,6 @@
-from unittest import mock
-
 import pytest
 
+from lazy_build import cache
 from lazy_build import config
 
 
@@ -15,6 +14,6 @@ def simple_config():
         command=('touch venv'),
         ignore={'*.py[co]'},
         output={'venv'},
-        backend=mock.Mock(),
+        backend=cache.FilesystemBackend(path='cache'),
         after_download=(),
     )
