@@ -69,3 +69,29 @@ def test_typical_flow(simple_project, capfd):
     assert out == ''
     assert simple_project.join('output1').read() == 'second input\n'
     assert simple_project.join('output2', 'thing').read() == 'asdf\n'
+
+
+def test_after_download_works(simple_project, capfd):
+    args = (
+        'build', '--verbose',
+        'context=', 'input',
+        'output=', 'output1', 'output2',
+        'after-download=', 'echo', 'it', 'was', 'downloaded',
+        'command=', 'bash', 'test.sh',
+    )
+
+    # The first run shouldn't be downloaded.
+    main.main(args)
+    out, err = capfd.readouterr()
+    assert out == 'ohai\n'
+    lines = err.splitlines()
+    assert 'Found no remote build artifact, building locally.' in lines
+    assert 'Uploading artifact to shared cache...' in lines
+
+    # The second run should be.
+    main.main(args)
+    out, err = capfd.readouterr()
+    assert out == 'it was downloaded\n'
+    lines = err.splitlines()
+    assert 'Found remote build artifact, downloading.' in lines
+    assert 'Running after-download script...' in lines
