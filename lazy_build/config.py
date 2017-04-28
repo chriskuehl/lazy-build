@@ -74,10 +74,8 @@ class Config(collections.namedtuple('Config', (
                         action = arg
                     else:
                         raise UsageError(
-                            'You already specified an action: {}\n'
-                            "You can't specify another: {}".format(
-                                action, arg,
-                            ),
+                            f'You already specified an action: {action}\n'
+                            f"You can't specify another: {arg}"
                         )
                 else:
                     if action is None:
@@ -89,14 +87,14 @@ class Config(collections.namedtuple('Config', (
                         phase = 1
                         if current_option not in options:
                             raise UsageError(
-                                'Unknown option: {}'.format(current_option),
+                                f'Unknown option: {current_option}',
                             )
             elif phase == 1:
                 if parsed is not None:
                     current_option = parsed.group(1)
                     if current_option not in options:
                         raise UsageError(
-                            'Unknown option: {}'.format(current_option),
+                            f'Unknown option: {current_option}',
                         )
                     elif current_option == 'command':
                         phase = 2
@@ -138,6 +136,10 @@ class Config(collections.namedtuple('Config', (
         if conf['cache']['source'] == 's3':
             backend = cache.S3Backend(
                 bucket=conf['cache']['bucket'],
+                path=conf['cache']['path'],
+            )
+        elif conf['cache']['source'] == 'filesystem':
+            backend = cache.FilesystemBackend(
                 path=conf['cache']['path'],
             )
         else:
