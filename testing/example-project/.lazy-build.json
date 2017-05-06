@@ -1,0 +1,6 @@
+{
+    "cache": {
+        "source": "filesystem",
+        "path": "cache"
+    }
+}

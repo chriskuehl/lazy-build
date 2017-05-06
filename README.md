@@ -58,3 +58,16 @@ Located as `.lazy-build.json` at the root of your project.
     ]
 }
 ```
+
+
+## Contributing
+
+To start, run `make minimal` to set up a development virtualenv, then activate
+it with `. venv/bin/activate`. This will put a `lazy-build` executable on your
+path using the local version of the code.
+
+There's an example project inside `testing/example-project` which contains a
+simple build script and Makefile. It uses a filesystem cache under a `cache`
+directory which you can easily inspect and clear during your testing. To
+attempt a build, run `make thing`. You should observe that the first run isn't
+cached, but the second is.
