@@ -1,11 +1,9 @@
-REBUILD_FLAG =
-
 .PHONY: minimal
 minimal: venv
 
 .PHONY: venv
-venv: .venv.touch
-	tox -e venv $(REBUILD_FLAG)
+venv:
+	tox -e venv
 
 .PHONY: release
 release: venv
@@ -13,12 +11,8 @@ release: venv
 	venv/bin/twine upload --skip-existing dist/*
 
 .PHONY: test
-test: .venv.tox.touch
-	tox $(REBUILD_FLAG)
-
-.venv.touch .venv.tox.touch: setup.py requirements-dev.txt
-	$(eval REBUILD_FLAG := --recreate)
-	touch "$@"
+test:
+	tox
 
 .PHONY: clean
 clean:

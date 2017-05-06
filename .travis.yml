@@ -3,7 +3,7 @@ python:
     - '3.6'
 dist: trusty
 sudo: false
-install: pip install tox coveralls
+install: pip install tox tox-pip-extensions coveralls
 script: make test
 after_success:
     - coveralls
